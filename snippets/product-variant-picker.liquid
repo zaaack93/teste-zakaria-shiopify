@@ -11,6 +11,12 @@ Usage:
 {% endcomment %}
 {%- unless product.has_only_default_variant -%}
   {%- if block.settings.picker_type == 'button' -%}
+    {% comment %}
+    // start-ECOM 
+    I worked on the first option so i render all the options as button but only size option i set it as dropdown menu
+    - I can also add a new option type of picker for handling this type
+    - here i set class hidden for fieldset which have option color 
+    {% endcomment %}
     <variant-radios
       class="no-js-hidden"
       data-section="{{ section.id }}"
@@ -37,38 +43,44 @@ Usage:
         {{ product.variants | json }}
       </script>
     </variant-radios>
+    {% comment %}
+    - here i render only the Size option as a dropdown component
+    {% endcomment %}
     <variant-selects
       class="no-js-hidden"
       data-section="{{ section.id }}"
       data-url="{{ product.url }}"
       {{ block.shopify_attributes }}>
       {%- for option in product.options_with_values -%}
-        <div class="product-form__input product-form__input--dropdown {% if option.name == 'Color' %} hidden {% endif %}">
-          <label class="form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
-            {{ option.name }}
-          </label>
-          <div class="select">
-            <select
-              id="Option-{{ section.id }}-{{ forloop.index0 }}"
-              class="select__select"
-              name="options[{{ option.name | escape }}]"
-              form="{{ product_form_id }}"
-              onchange="myfaunc('Option-{{ section.id }}-{{ forloop.index0 }}')">
-              {%- for value in option.values -%}
-                <option value="{{ value | escape }}" {% if option.selected_value == value %}selected="selected"{% endif %}>
-                  {{ value }}
-                </option>
-              {%- endfor -%}
-            </select>
-            {% render 'icon-caret' %}
+        {% if option.name == 'Size' %}
+          <div class="product-form__input product-form__input--dropdown">
+            <label class="form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
+              {{ option.name }}
+            </label>
+            <div class="select">
+              <select
+                id="Option-{{ section.id }}-{{ forloop.index0 }}"
+                class="select__select"
+                name="options[{{ option.name | escape }}]"
+                form="{{ product_form_id }}"
+                onchange="handleOptionSelect('Option-{{ section.id }}-{{ forloop.index0 }}')">
+                {%- for value in option.values -%}
+                  <option value="{{ value | escape }}" {% if option.selected_value == value %}selected="selected"{% endif %}>
+                    {{ value }}
+                  </option>
+                {%- endfor -%}
+              </select>
+              {% render 'icon-caret' %}
+            </div>
           </div>
-        </div>
+        {% endif %}
       {%- endfor -%}
       <script>
-        function myfaunc(selector) {
-          d = document.getElementById(`${selector}`).value;
+        // This function it's called when the select dropdown is changed, i set the selected value to the hidden radio item, the purpose is triggering the update variant event
+        function handleOptionSelect(selector) {
+          selectedValue = document.getElementById(`${selector}`).value;
           for (let item of document.getElementsByName("Size")) {
-            if (item.value == d) {
+            if (item.value == selectedValue) {
               item.click()
               return
             }
@@ -79,6 +91,7 @@ Usage:
         {{ product.variants | json }}
       </script>
     </variant-selects>
+    {% comment %}End-Ecom{% endcomment %}
   {%- else -%}
     <variant-selects
       id="variant-selects-{{ section.id }}"
@@ -123,7 +136,7 @@ Usage:
         class="select__select"
         form="{{ product_form_id }}">
         {%- for variant in product.variants -%}
-          <option {% if variant == product.selected_or_first_available_variant %}selected="selected"{% endif %}{% if variant.available == false %}disabled{% endif %}value="{{ variant.id }}">
+          <option {% if variant == product.selected_or_first_available_variant %}selected="selected"{% endif %}{% if variant.available == false %}disabled{% endif %} value="{{ variant.id }}">
             {%- liquid
               echo variant.title
               echo variant.price | money | strip_html | prepend: ' - '

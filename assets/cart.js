@@ -98,16 +98,20 @@ class CartItems extends HTMLElement {
         return response.text();
       })
       .then(async (state) => {
-        const lineNew = document.getElementById(`CartItem-${line}`) || document.getElementById(`CartDrawer-Item-${line}`);
-        if (lineNew.getAttribute('data-product-id') === "44518022611248" && quantity == 0) {
+        // start-ECOM --- I check here if the product id is equal with the variant ID which have options  Black and medium , as well as if the quentity is 0 so it's a delete action
+        // Then i send another request for delete the product bundle
+        const activeLine = document.getElementById(`CartItem-${line}`) || document.getElementById(`CartDrawer-Item-${line}`);
+        if (activeLine.getAttribute('data-product-id') === "44518022611248" && quantity == 0) {
           const body = JSON.stringify({
             id:'44517579817264',
             quantity:0,
             sections: this.getSectionsToRender().map((section) => section.section),
             sections_url: window.location.pathname
           });
+          //here i overide the state with the new state given by our request
           state= await (await fetch(`${routes.cart_change_url}`, { ...fetchConfig(), ...{ body } })).text()
         }
+        // End-ECOM 
         const parsedState = JSON.parse(state);
         const quantityElement = document.getElementById(`Quantity-${line}`) || document.getElementById(`Drawer-quantity-${line}`);
         const items = document.querySelectorAll('.cart-item');

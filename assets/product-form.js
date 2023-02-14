@@ -60,6 +60,8 @@ if (!customElements.get('product-form')) {
             }, { once: true });
             quickAddModal.hide(true);
           } else {
+            // start-ECOM --- I check here if the product added to cart is the product with options Black & Medium 
+            // I check with the variant ID for make sure and then i add the product to the cart and i rerender the content  with the new response
             if (response.id == 44518022611248) {
               formData.set("id", 44517579817264)
               formData.set("quantity", 1)
@@ -72,8 +74,10 @@ if (!customElements.get('product-form')) {
               })
             }
             else {
+              //otherwise we keep the process as before
               this.cart.renderContents(response);
             }
+            // End-ECOM 
           }
         })
         .catch((e) => {
