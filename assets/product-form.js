@@ -60,7 +60,20 @@ if (!customElements.get('product-form')) {
             }, { once: true });
             quickAddModal.hide(true);
           } else {
-            this.cart.renderContents(response);
+            if (response.id == 44518022611248) {
+              formData.set("id", 44517579817264)
+              formData.set("quantity", 1)
+              fetch(`${routes.cart_add_url}`, config).then((response) => response.json())
+                .then((response) => {
+                  this.cart.renderContents(response);
+                })
+              .catch((e) => {
+                console.error(e);
+              })
+            }
+            else {
+              this.cart.renderContents(response);
+            }
           }
         })
         .catch((e) => {

@@ -97,7 +97,17 @@ class CartItems extends HTMLElement {
       .then((response) => {
         return response.text();
       })
-      .then((state) => {
+      .then(async (state) => {
+        const lineNew = document.getElementById(`CartItem-${line}`) || document.getElementById(`CartDrawer-Item-${line}`);
+        if (lineNew.getAttribute('data-product-id') === "44518022611248" && quantity == 0) {
+          const body = {
+            id:44517579817264,
+            quantity:0,
+            sections: this.getSectionsToRender().map((section) => section.section),
+            sections_url: window.location.pathname
+          };
+           state=await fetch(`${routes.cart_change_url}`, { ...fetchConfig(), ...{ body }})
+        }
         const parsedState = JSON.parse(state);
         const quantityElement = document.getElementById(`Quantity-${line}`) || document.getElementById(`Drawer-quantity-${line}`);
         const items = document.querySelectorAll('.cart-item');
